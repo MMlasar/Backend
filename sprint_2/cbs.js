@@ -1,5 +1,5 @@
-const fs = require("fs").promises;
-const path = require("path");
+import { promises as fs } from "fs";
+import path from "path";
 
 class ProductManager {
     constructor() {
@@ -43,24 +43,32 @@ class ProductManager {
         return products.find((product) => product.id === id);
     };
 
+    destroy = async (id) => {
+        this.products = this.products.filter((product) => product.id !== id);
+        await this.writeProductsToFile();
+    };
+
     writeProductsToFile = async () => {
         await fs.writeFile(this.path, JSON.stringify(this.products, null, 2));
     };
 }
 
-
 (async () => {
     const productManager = new ProductManager();
 
-    
     await productManager.addProduct("pc", "Pc gamer", 1200, 10);
 
-    
     const allProducts = await productManager.getProducts();
     console.log("Todos los productos:", allProducts);
 
-    
     const productById = await productManager.getProductByID(1);
     console.log("Producto con ID 1:", productById);
+
+    await productManager.destroy(1);
+    console.log("Producto con ID 1 eliminado.");
+
+    const updatedProducts = await productManager.getProducts();
+    console.log("Productos actualizados:", updatedProducts);
 })();
 
+export default ProductManager;

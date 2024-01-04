@@ -37,27 +37,36 @@ class ProductosManager {
     readById(id) {
         return ProductosManager.product.find(each => each.id === parseInt(id));
     }
+
+    destroy(id) {
+        ProductosManager.product = ProductosManager.product.filter(each => each.id !== parseInt(id));
+    }
 }
 
-const product = new ProductosManager({
+const productManager = new ProductosManager({
     name: "producto1",
     price: "1000",
     stock: "30",
 });
 
-product.create({
+productManager.create({
     name: "producto2",
     price: "500",
     stock: "10",
 });
 
-product.create({
+productManager.create({
     name: "producto3",
     price: "10000",
     stock: "5",
 });
 
-console.log(product.read());
-console.log(product.readById(1));
+console.log(productManager.read());
+console.log(productManager.readById(1));
 
+productManager.destroy(2);
+console.log("Producto con ID 2 eliminado.");
+
+const updatedProducts = productManager.read();
+console.log("Productos actualizados:", updatedProducts);
 
