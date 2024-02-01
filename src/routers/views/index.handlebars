@@ -1,0 +1,14 @@
+<Main>
+    <h1> Pagina de productos </h1>
+    <h3> {{date}} </h3>
+
+    {{#if details }}
+        <p> {{details}} </p>
+    {{else}}
+        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Unde inventore fugit nihil velit eius. Error dolore officia aliquam cumque natus tenetur doloremque, nisi quia repellat, voluptatem sed, numquam atque ut.</p>
+    {{/if}}
+
+    {{#each Products}}
+        <h3> {{this}} </h3>
+    {{/each}}
+</Main>
