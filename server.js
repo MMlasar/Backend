@@ -1,4 +1,6 @@
 // server.js
+import "dotenv/config.js";
+
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from "socket.io";
@@ -10,12 +12,16 @@ import morgan from "morgan";
 import path from "path";
 import { startSocket, messages } from './src/utils/socket.utils.js';
 import ManagerProduct from './src/data/fs/products.fs.js';
+import dbconnection from "./src/utils/db.js";
+
+
 
 const app = express();
 const PORT = 8080;
 
 const ready = () => {
     console.log(`Server ready on port ${PORT}`);
+    dbconnection()
 };
 
 const httpServer = createServer(app);
