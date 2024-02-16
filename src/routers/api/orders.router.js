@@ -1,109 +1,104 @@
-import { Router } from "express"
-import ManagerOrders  from "../../data/fs/orders.fs.js"
+import { Router } from "express";
 import propsOrder from "../../middlewares/propsOrders.js";
+// import ManagerOrders from "../../data/fs/orders.fs.js"; // Comentar para usar MongoDB
+import { order } from "../../data/mongo/models/order.model.js"; // Importar el modelo de pedidos de MongoDB
 
-const ordersRouter = Router()
+const ordersRouter = Router();
 
 ordersRouter.post("/", propsOrder, async (req, res, next) => {
     try {
-      const data = req.body;
-      const response = await ManagerOrders.create(data);
-      
+        const data = req.body;
+        const response = await order.create(data); // Utilizar el modelo de pedidos de MongoDB
         return res.json({
-          statusCode: 201,
-          response,
+            statusCode: 201,
+            response,
         });
-      
     } catch (error) {
         return next(error);
     }
-  });
-  
+});
 
-ordersRouter.get ('/', async (req,res, next)=>{
+ordersRouter.get('/', async (req, res, next) => {
     try {
-        const orders = await ManagerOrders.read()
-        if(orders){
-            return res.json({
+        // Para usar el administrador de pedidos del sistema de archivos
+        // allOrders = await ManagerOrders.read();
+
+        // Para usar el modelo de pedidos de MongoDB
+        const allOrders = await order.find(); // Utilizar el modelo de pedidos de MongoDB
+        if (allOrders) {
+            return res.status(200).json({
                 statusCode: 200,
-                response: orders
-            })
-        }else{
-            return res.json({
+                response: allOrders,
+            });
+        } else {
+            return res.status(404).json({
                 statusCode: 404,
-                message: "Not found!"
-            })
+                message: "Not found!",
+            });
         }
-        
     } catch (error) {
         return next(error);
-        
     }
-    
-})
+});
 
-ordersRouter.get ('/:uid', async (req,res, next)=>{
+ordersRouter.get('/:uid', async (req, res, next) => {
     try {
-        const {uid} = req.params
-        const order =await ManagerOrders.readOne(uid)
-        if(order){
-            return res.json({
+        const { uid } = req.params;
+        const orderDetails = await order.findById(uid); // Utilizar el modelo de pedidos de MongoDB
+        if (orderDetails) {
+            return res.status(200).json({
                 statusCode: 200,
-                response: order
-            })
-        }else{
-            return res.json({
+                response: orderDetails,
+            });
+        } else {
+            return res.status(404).json({
                 statusCode: 404,
-                message: "Not found!"
-            })
+                message: "Not found!",
+            });
         }
-        
     } catch (error) {
         return next(error);
     }
-    
-})
+});
 
-ordersRouter.delete('/:oid', async (req,res, next)=>{
+ordersRouter.delete('/:oid', async (req, res, next) => {
     try {
-        const {oid} = req.params
-        const order = await ManagerOrders.destroy(oid)
-        if(order){
-            return res.json({
+        const { oid } = req.params;
+        const deletedOrder = await order.findByIdAndDelete(oid); // Utilizar el modelo de pedidos de MongoDB
+        if (deletedOrder) {
+            return res.status(200).json({
                 statusCode: 200,
-                response: order
-            })
-        }else{
-            return res.json({
+                response: deletedOrder,
+            });
+        } else {
+            return res.status(404).json({
                 statusCode: 404,
-                message: "Not found!"
-            })
+                message: "Not found!",
+            });
         }
-        
     } catch (error) {
         return next(error);
     }
-})
+});
 
-ordersRouter.put('/:oid/:quantity/:state', async (req,res, next)=>{
+ordersRouter.put('/:oid/:quantity/:state', async (req, res, next) => {
     try {
-        const {oid, quantity, state} = req.params
-        const order = await ManagerOrders.update(oid,quantity,state)
-        if(order){
-            return res.json({
+        const { oid, quantity, state } = req.params;
+        const updatedOrder = await order.findByIdAndUpdate(oid, { quantity, state }, { new: true }); // Utilizar el modelo de pedidos de MongoDB
+        if (updatedOrder) {
+            return res.status(200).json({
                 statusCode: 200,
-                response: order
-            })
-        }else{
-            return res.json({
+                response: updatedOrder,
+            });
+        } else {
+            return res.status(404).json({
                 statusCode: 404,
-                message: "Not found!"
-            })
+                message: "Not found!",
+            });
         }
-        
     } catch (error) {
         return next(error);
     }
-})
+});
 
-export default ordersRouter
+export default ordersRouter;
