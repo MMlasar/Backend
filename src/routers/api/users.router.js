@@ -20,7 +20,19 @@ usersRouter.post("/", propsUser, async (req, res, next) => {
 
 usersRouter.get('/', async (req, res, next) => {
     try {
-        const allUsers = await users.read(); // Utilizar users de MongoDB
+        const orderAndPaginate = {
+            limit: req.query.limit || 20,
+            page: req.query.page || 1,
+           // sort: { email: 1 }
+        };
+        const filter = {};
+        if (req.query.email) {
+            filter.email = new RegExp(req.query.email.trim(), "i");
+        }
+        if (req.query.sortDesc === "true") {
+            orderAndPaginate.sort.email = -1;
+        }
+        const allUsers = await users.read({ filter, orderAndPaginate });
         if (allUsers) {
             return res.status(200).json({
                 statusCode: 200,
@@ -36,6 +48,7 @@ usersRouter.get('/', async (req, res, next) => {
         return next(error);
     }
 });
+
 
 usersRouter.get('/:uid', async (req, res, next) => {
     try {

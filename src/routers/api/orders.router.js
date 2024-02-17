@@ -2,6 +2,7 @@ import { Router } from "express";
 import propsOrder from "../../middlewares/propsOrders.js";
 // import ManagerOrders from "../../data/fs/orders.fs.js"; // Comentar para usar MongoDB
 import { order } from "../../data/mongo/models/order.model.js"; // Importar el modelo de pedidos de MongoDB
+import { orders } from "../../data/mongo/manager.mongo.js";
 
 const ordersRouter = Router();
 
@@ -40,6 +41,22 @@ ordersRouter.get('/', async (req, res, next) => {
         return next(error);
     }
 });
+
+
+ordersRouter.get("/bills/:uid", async(req,res,next)=>{
+    try {
+        const { uid } = req.params
+        const report = await orders.reportBill(uid)
+        return res.json({
+            statusCode: 200,
+            response: report
+        })
+    } catch (error) {
+        return next(error)
+    }
+})
+
+
 
 ordersRouter.get('/:uid', async (req, res, next) => {
     try {

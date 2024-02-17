@@ -3,6 +3,8 @@ import Product from "./models/product.model.js";
 import order from "./models/order.model.js";
 import notFoundOne from "../../utils/notFoundOne.utils.js";
 import { Stats } from "fs";
+import { Types } from "mongoose";
+import { types } from "util";
 
 
 
@@ -21,12 +23,16 @@ class MongoManager {
         }
     }
 
-    async read(obj) {
+    async read( { filter , orderAndPaginate} ) {
         try {
-            const { filter, order } = obj;
-            const all = await this.model.find(filter).sort(order);
+            const all = await this.model
+            //const all = await this.model.find(filter).sort(order);
+
+            .paginate(filter, orderAndPaginate);
+            //console.log(all.docs);
     
-            if (all.length === 0) {
+            //if (all.docs.length === 0) {
+                if (all.totalPages === 0){
                 const error = new Error("there aren't products");
                 error.statusCode = 404;
                 throw error;
@@ -34,6 +40,28 @@ class MongoManager {
             return all;
         } catch (error) {
             throw error;
+        }
+    }
+
+    async reportBill (uid) {
+        try {
+            const report = await this.model.aggregate([
+                {$match: { user_id: new types.ObjetId(uid)}},
+                {$lookup: { 
+                    from:"products",
+                    foreignField: "_id",
+                    localField:"product_id",
+                    as:"product_id",
+                }},
+                {$replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElementAt: ["$product_id", 0]}, "$$ROOT" ] } } },
+                {$set : { subtotal: {$multiply:["$price","$quantity"]}}},
+                {$group: { _id:"$product_id", total: { $sum: "$subtotal"}} },
+                {$project: {_id:0, product_id:"$_id", total: "$total", date: new Date() } },
+                //{$marge: { into: "bills"}},
+            ]);
+            return report
+        } catch (error) {
+            throw error
         }
     }
     
