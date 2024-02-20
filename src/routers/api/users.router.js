@@ -1,108 +1,114 @@
-import { Router } from "express"
-import ManagerUser  from "../../data/fs/user.fs.js"
+import { Router } from "express";
 import propsUser from "../../middlewares/propsUser.js";
-const usersRouter = Router()
+//import { ManagerUser } from "../../data/fs/user.fs.js"; // Importar ManagerUser de FileSystem
+import { users, products } from "../../data/mongo/manager.mongo.js"; // Importar users y products de MongoDB
+
+const usersRouter = Router();
 
 usersRouter.post("/", propsUser, async (req, res, next) => {
     try {
-      const data = req.body;
-      const response = await ManagerUser.create(data);
-      
-        return res.json({
-          statusCode: 201,
-          response,
+        const userData = req.body;
+        const userId = await ManagerUser.create(userData); // Utilizar ManagerUser de FileSystem
+        return res.status(201).json({
+            statusCode: 201,
+            userId: userId,
         });
-      
     } catch (error) {
         return next(error);
     }
-  });
+});
 
-  usersRouter.get ('/', async (req,res, next)=>{
+usersRouter.get('/', async (req, res, next) => {
     try {
-        const users = await ManagerUser.read()
-        if(users){
-            return res.json({
-                statusCode: 200,
-                response: users
-            })
-        }else{
-            return res.json({
-                statusCode: 404,
-                message: "Not found!"
-            })
+        const orderAndPaginate = {
+            limit: req.query.limit || 20,
+            page: req.query.page || 1,
+           // sort: { email: 1 }
+        };
+        const filter = {};
+        if (req.query.email) {
+            filter.email = new RegExp(req.query.email.trim(), "i");
         }
-        
-    } catch (error) {
-        return next(error);
-    }
-    
-})
-
-usersRouter.get ('/:uid', async (req,res, next)=>{
-    try {
-        const {uid} = req.params
-        const user =await ManagerUser.readOne(uid)
-        if(user){
-            return res.json({
-                statusCode: 200,
-                response: user
-            })
-        }else{
-            return res.json({
-                statusCode: 404,
-                message: "Not found!"
-            })
+        if (req.query.sortDesc === "true") {
+            orderAndPaginate.sort.email = -1;
         }
-        
+        const allUsers = await users.read({ filter, orderAndPaginate });
+        if (allUsers) {
+            return res.status(200).json({
+                statusCode: 200,
+                response: allUsers,
+            });
+        } else {
+            return res.status(404).json({
+                statusCode: 404,
+                message: "Not found!",
+            });
+        }
     } catch (error) {
         return next(error);
     }
-    
-})
+});
 
-usersRouter.put('/:uid', async (req,res, next)=>{
+
+usersRouter.get('/:uid', async (req, res, next) => {
     try {
-        const {uid} = req.params
+        const { uid } = req.params;
+        const user = await users.readOne(uid); // Utilizar users de MongoDB
+        if (user) {
+            return res.status(200).json({
+                statusCode: 200,
+                response: user,
+            });
+        } else {
+            return res.status(404).json({
+                statusCode: 404,
+                message: "Not found!",
+            });
+        }
+    } catch (error) {
+        return next(error);
+    }
+});
+
+usersRouter.put('/:uid', async (req, res, next) => {
+    try {
+        const { uid } = req.params;
         const data = req.body;
-        const user = await ManagerUser.update(uid,data)
-        if(user){
-            return res.json({
+        const updatedUser = await users.update(uid, data); // Utilizar users de MongoDB
+        if (updatedUser) {
+            return res.status(200).json({
                 statusCode: 200,
-                response: user
-            })
-        }else{
-            return res.json({
+                response: updatedUser,
+            });
+        } else {
+            return res.status(404).json({
                 statusCode: 404,
-                message: "Not found!"
-            })
+                message: "Not found!",
+            });
         }
-        
     } catch (error) {
         return next(error);
     }
-})
+});
 
-usersRouter.delete('/:uid', async (req,res, next)=>{
+usersRouter.delete('/:uid', async (req, res, next) => {
     try {
-        const {uid} = req.params
-        const user = await ManagerUser.destroy(uid)
-        if(user){
-            return res.json({
+        const { uid } = req.params;
+        const deletedUser = await users.destroy(uid); // Utilizar users de MongoDB
+        if (deletedUser) {
+            return res.status(200).json({
                 statusCode: 200,
-                response: user
-            })
-        }else{
-            return res.json({
+                response: deletedUser,
+            });
+        } else {
+            return res.status(404).json({
                 statusCode: 404,
-                message: "Not found!"
-            })
+                message: "Not found!",
+            });
         }
-        
     } catch (error) {
         return next(error);
     }
-})
+});
 
-
-export default usersRouter
+export default usersRouter;

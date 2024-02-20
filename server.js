@@ -12,7 +12,9 @@ import morgan from "morgan";
 import path from "path";
 import { startSocket, messages } from './src/utils/socket.utils.js';
 import ManagerProduct from './src/data/fs/products.fs.js';
-import dbconnection from "./src/utils/db.js";
+import dbconnection from "./src/utils/db.connection.utils.js";
+import cookieParser from "cookie-parser";
+import session from "express-session";
 
 
 
@@ -43,6 +45,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
+app.use(cookieParser())
+app.use(expressSession({
+    secret: "process.env SECRET_KEY",
+    reserve: true,
+    saveUnitialized: true,
+    cookie: { maxAge: 60000},
+}))
 
 // Routers
 app.use("/", router);
