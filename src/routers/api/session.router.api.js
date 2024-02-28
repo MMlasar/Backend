@@ -1,27 +1,38 @@
 import { Router } from "express";
+import {user, users} from "../../data/mongo/manager.mongo.js";
+import has8char from "../../middlewares/has8char.mid.js";
+import isValidPass from "../../middlewares/isValidPass.mid.js";
+import passport from "../../middlewares/passport.mid.js";
 
 const sessionsRouter = Router()
 
-//login
-sessionsRouter.post("/login", async(req,res,next)=>{
+
+//register
+sessionsRouter.post("/register", has8char, passport.authenticate( "register", {session:false, failureRedirect: "/api/sessions/badauth" }), async (req, res, next) => {
     try {
-        const { email, password } = req.body;
-        if (email && password==="hola1234") {
-            req.session.email = email;
-            req.session.role = "admin"
-            return res.json({
-                statuscode: 200,
-                messeage: " logged in ",
-                session: req.session
-            })
-        }
-        const error = new Error ( "Bad Auth" );
-        error.statuscode = 401;
-        throw error;
+        return res.json({
+            statuscode: 401,
+            message: "Registered!"
+        });
     } catch (error) {
-      return next(error)  
+        return next(error);
     }
-})
+});
+
+
+//login
+sessionsRouter.post("/login", passport.authenticate("login", { session: false, failureRedirect: "/api/sessions/badauth"}), async (req, res, next) => {
+    try {
+        return res.json({
+            statuscode: 200,
+            message: "Logged in",
+            session: req.session
+        });
+    } catch (error) {
+        return next(error);  
+    }
+});
+
 
 //me
 sessionsRouter.post("/", async (req, res, next) => {
@@ -60,7 +71,18 @@ sessionsRouter.post("/signout",async(req,res,next)=>{
     }
 })
 
+//badauth
 
+sessionsRouter.get("/badauth",(req,res,next)=>{
+    try {
+      return res.json({
+        statuscode:401,
+        message: "Bad auth"
+      })  
+    } catch (error) {
+        return next(error)
+    }
+})
 
 
 export default sessionsRouter

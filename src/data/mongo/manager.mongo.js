@@ -67,13 +67,25 @@ class MongoManager {
     
     async readOne(id) {
         try {
-            const one = await this.model.findById(id);
-            notFoundOne(one)
+            const one = await this.model.findById(id).lean();
+            notFoundOne(one);
+            return one;
          }    catch (error) {
             throw error;
         }
-     
     }
+
+    async readByEmail(email){
+        try {
+            const one = await this.model.findOne({ email })
+           //notFoundOne(one);
+            return one;
+        } catch (error) {
+            throw error
+        }
+    }
+
+    
 
     async update(id, data) {
         try {

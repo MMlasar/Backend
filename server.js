@@ -15,6 +15,8 @@ import ManagerProduct from './src/data/fs/products.fs.js';
 import dbconnection from "./src/utils/db.connection.utils.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import sessionFileStote from "session-file-store";
+import MongoStore from "connect-mongo";
 
 
 
@@ -40,18 +42,36 @@ app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", path.join(__dirname, "src/views"));
 
+const FileStore = sessionFileStote(expressSession);
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
 app.use(cookieParser())
-app.use(expressSession({
-    secret: "process.env SECRET_KEY",
-    reserve: true,
-    saveUnitialized: true,
-    cookie: { maxAge: 60000},
-}))
+//app.use(expressSession({
+  //  secret: "process.env SECRET_KEY",
+    //reserve: true,
+    //saveUnitialized: true,
+    //store: new FileStore({
+      //  path: "./src/data/fs/files/sessions",
+        //ttl: 10,
+        //retries: 2,
+    //})
+//}))
+
+app.use(expressSession)({
+    secret: process.env.SECRET_KEY,
+    resave: true,
+    saveUninitialized: true,
+    store: new MongoStore({
+        ttl: 7 *24 *60 *60,
+        mongoUrl: process.env.DB_LINK
+    })
+
+})
+
 
 // Routers
 app.use("/", router);
