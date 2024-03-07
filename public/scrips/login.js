@@ -1,26 +1,32 @@
-import { response } from "express"
+import { response } from "express";
 
-const selector = document.querySelector("#login")
-selector.addEventListener("click",async()=>{
+const loginBtn = document.querySelector("#login");
+
+loginBtn.addEventListener("click", async () => {
     try {
-        const data = {
-            email: document.querySelector("#email").value ,
-            password: document.querySelector("#password").value ,
-        }
-        //console.log(data)
-        const opts = {
+        const email = document.querySelector("#email").value;
+        const password = document.querySelector("#password").value;
+
+        const response = await fetch("/api/session/login", {
             method: "POST",
-            headers:{ "Content-type": " application/json" },
-            body: JSON.stringify(data)
-        }
-        let response = await fetch("/api/session/login", opts)
-        response = await response.json()
-        //console.log(response);
-        if( response.session ){
-            alert(response.message)
-            response.session && location.replace("/")
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
+
+        const responseData = await response.json();
+
+        if (response.ok) {
+            alert(responseData.message);
+            if (responseData.statuscode === 200) {
+                location.replace("/");
+               // localStorage.setItem("token", responseData.token);
+            }
+        } else {
+            throw new Error(responseData.message);
         }
     } catch (error) {
-        alert(error.message)
+        alert(error.message);
     }
-})
+});

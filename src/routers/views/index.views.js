@@ -1,20 +1,24 @@
-import { Router } from "express";
+import CustomRouter from "../customRouter";
 import productsRouter from "./products.views";
 import userRouter from "./user.view";
 
-const viewsRouter = Router();
-
-viewsRouter.get("/",(req,res,next)=>{
-    try {
-        const mainProducts = ["tablet samsung ","laptop","tv"]
-        const date = new Date ();
-        return res.render("index",{products: mainProducts, date: date });
-    } catch (error) {
-        next(error)
+export default class viewsRouter extends CustomRouter {
+    init(){
+        this.router.use("/users", userRouter);
+        this.router.use("/products",productsRouter);
+        this.read("/",["PUBLIC"],(req,res,next)=>{
+            try {
+                const mainProducts = ["tablet samsung ","laptop","tv"]
+                const date = new Date ();
+                return res.render("index",{products: mainProducts, date: date });
+            } catch (error) {
+                next(error)
+                
+            }
+        });
         
     }
-});
+}
 
-viewsRouter.use("/users", userRouter);
-viewsRouter.use("/products",productsRouter);
-export default viewsRouter;
+
+

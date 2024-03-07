@@ -4,7 +4,7 @@ import "dotenv/config.js";
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from "socket.io";
-import router from './src/routers/index.router.js';
+import IndexRouter from './src/routers/index.router.js';
 import errorHandler from "./src/middlewares/errorHandler.js";
 import pathHandler from "./src/middlewares/pathHandler.js";
 import { engine } from "express-handlebars";
@@ -74,7 +74,8 @@ app.use(expressSession)({
 
 
 // Routers
-app.use("/", router);
+const router = new IndexRouter();
+app.use("/", router. getRouter());
 app.use(errorHandler);
 app.use(pathHandler);
 
