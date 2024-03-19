@@ -6,15 +6,17 @@ import sessionsRouter from "./session.router.api.js";
 import passport from "../../middlewares/passport.mid.js";
 import passCallBackMid from "../../middlewares/passCallBack.mid.js";
 import { products } from "../../data/mongo/manager.mongo.js";
+import commentsRouter from "./comments.router.js";
 
 const product = new ProductsRouter()
 
  export default class apiRouter extends CustomRouter {
     init() {
-        this.Router.use("/users", usersRouter);
-        this.Router.use("/products", product.getRouter());
-        this.Router.use("/orders", passCallBackMid("jwt"), ordersRouter);
-        this.Router.use("/sessions", sessionsRouter);
+        this.use("/users", usersRouter);
+        this.use("/products", product.getRouter());
+        this.use("/orders", passCallBackMid("jwt"), ordersRouter);
+        this.use("/sessions", sessionsRouter);
+        this.use("/comments", commentsRouter);
     }
 }
 

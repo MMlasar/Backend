@@ -15,7 +15,7 @@ export default class CustomRouter {
         // cbs es un array de callbacks ( ej todos los middleware que necesita el endopint)
         return cbs.map(each=>async(...params)=>{
             try {
-                await each.apply(this,params)
+                await each.apply(this.params)
             } catch (error) {
                /* return*/ params [1].json({statuscode:500, message:error.message});
             }

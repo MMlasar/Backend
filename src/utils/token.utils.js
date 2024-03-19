@@ -1,13 +1,15 @@
 import jwt from "jsonwebtoken";
 
 const createToken = (data) => {
+    const expiresIn = 60 * 60 * 24 * 7;
+    const expirationDate = Math.floor(Date.now() / 1000) + expiresIn;
     const token = jwt.sign(
-        data,
-        process.env.SECRET,
-        { expiresIn: 60 * 60 * 24 * 7 }
+        { ...data, exp: expirationDate },
+        process.env.SECRET
     );
     return token;
 };
+
 
 const verifyToken = (token) => {
     if (token) {

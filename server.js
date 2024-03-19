@@ -1,5 +1,5 @@
 // server.js
-import "dotenv/config.js";
+import env from "./src/utils/env.utils.js";
 
 import express from 'express';
 import { createServer } from 'http';
@@ -17,11 +17,12 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import sessionFileStote from "session-file-store";
 import MongoStore from "connect-mongo";
-
+import args from "./src/utils/args.utils.js";
+import cors from "cors"
 
 
 const app = express();
-const PORT = 8080;
+const PORT = env.PORT || 8080;
 
 const ready = () => {
     console.log(`Server ready on port ${PORT}`);
@@ -49,7 +50,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
-app.use(cookieParser())
+app.use(cookieParser());
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 //app.use(expressSession({
   //  secret: "process.env SECRET_KEY",
     //reserve: true,
