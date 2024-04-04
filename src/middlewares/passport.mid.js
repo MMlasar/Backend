@@ -13,15 +13,13 @@ passport.use("login", new LocalStrategy({ passReqToCallback: true, usernameField
     async (req, email, password, done) => {
         try {
             const user = await users.readByEmail(email);
-            if (!user || !verifyHash(password, user.password)) {
-                return done(null, false);
+            const verify = verifyHash(password, user.passpord);
+            if (user?.verified && verify) {
+                req.token = createToken ({_id: user._id, role: user.role});
+                return done ( null, user);
+            }else{
+                return done (null, false , { statuscode: 401 });
             }
-
-            // Si el usuario y la contraseña son válidos, crear un token de sesión
-            const token = createToken({ email, role: user.role });
-            req.token = token;
-            // Llamar a done() con el usuario autenticado
-            return done(null, user);
         } catch (error) {
             return done(error);
         }
@@ -92,7 +90,7 @@ passport.use(
                     return done(null, false,{messages:"Already exists", statuscode: 400 })
                 }
             } catch (error) {
-                return next ( error)
+                return done ( error)
             }
         }
     )

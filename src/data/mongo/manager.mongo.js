@@ -127,10 +127,6 @@ class MongoManager {
     }
 }
 
-const users = new MongoManager(User)
-const products = new MongoManager(Product)
-const orders = new MongoManager(order)
-const comments = new MongoManager (comments)
 
-export { users , products, orders, comments };
+
 export default MongoManager;

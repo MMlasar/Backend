@@ -1,11 +1,10 @@
 import crypto from "crypto";
+import notFoundOne from "../../utils/notFoundOne.utils.js";
 
 class ProductManager {
   static #products = [];
-  constructor() {
-  }
 
-  create(data) {
+  static create(data) {
     try {
       const newProduct = {
         id: crypto.randomBytes(12).toString("hex"),
@@ -19,91 +18,63 @@ class ProductManager {
         ProductManager.#products.push(newProduct);
         return newProduct;
       } else {
-        throw new Error(
-          "Los campos title, photo, price, stock son obligatorias"
-        );
+        throw new Error("Los campos title, photo, price, stock son obligatorias");
       }
     } catch (error) {
-      return error.message;
+      throw error;
     }
   }
 
-  read() {
+  static read() {
     try {
-      if(ProductManager.#products.length === 0){
-        throw new Error("No se encontro ningun producto")
-      }else{
+      if (ProductManager.#products.length === 0) {
+        throw new Error("No se encontraron productos");
+      } else {
         return ProductManager.#products;
       }
     } catch (error) {
-      return error.message;
+      throw error;
     }
-    
   }
 
-  readOne(id) {
+  static readOne(id) {
     try {
-      const product = ProductManager.#products.find(
-        (product) => product.id === id
-      );
-
-      if(product){
-        return product
-      }else{
-        throw new Error("No encontrado")
-      }
+      const product = ProductManager.#products.find((product) => product.id === id);
+      notFoundOne(product);
+      return product;
     } catch (error) {
-      return error.message
+      throw error;
     }
-    
   }
 
-  destroy(id){
+  static destroy(id) {
     try {
-      const product = ProductManager.#products.find(
-        (product) => product.id === id
-      );
-      if (!product) {
-        throw new Error("No se encontro producto!");
+      const productIndex = ProductManager.#products.findIndex((product) => product.id === id);
+      if (productIndex === -1) {
+        throw new Error("No se encontró el producto");
       } else {
-        const index = ProductManager.#products.indexOf(product);
-        ProductManager.#products.splice(index, 1);
-        
+        ProductManager.#products.splice(productIndex, 1);
         return "Producto eliminado";
       }
     } catch (error) {
-      return error.message;
+      throw error;
     }
   }
 
-  update(id,data){
+  static async update(id, data) {
     try {
-     const one= this.readOne(id);
-     
-     if(!one){
-       throw new Error("No se encontro producto!")
-      }else{
-
-        const index = ProductManager.#products.indexOf(one);
-          one.title= data.title || one.title,
-          one.photo= data.photo || one.photo,
-          one.price= data.price || one.price,
-          one.stock= data.stock || one.stock,
-
-          ProductManager.#products[index] = one;
-          
-
-        return "producto actualizada"
+      const one = await this.readOne(id);
+      notFoundOne(one);
+      for (let each in data) {
+        one[each] = data[each];
       }
-
+      return one;
     } catch (error) {
-      return error.message;
+      throw error;
     }
   }
 }
 
-const Manager = new ProductManager();
+const products = new ProductManager();
+export default products;
 
-console.log(Manager.create({ photo: "https://picsum.photos/200", price: 100, stock: 10 })); 
-
-console.log(Manager.read());

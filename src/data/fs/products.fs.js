@@ -1,5 +1,6 @@
 import fs from "fs";
 import crypto from "crypto";
+import notFoundOne from "../../utils/notFoundOne.utils";
 
 class ProductManager {
   static #products = [];
@@ -21,78 +22,57 @@ class ProductManager {
     }
   }
 
-  create(data) {
+  create = async (data) => {
     try {
-      
-      const newProduct = {
-        id: crypto.randomBytes(12).toString("hex"),
-        title: data.title,
-        photo: data.photo,
-        price: data.price,
-        stock: data.stock,
-      };
-
-      ProductManager.#products.push(newProduct);
-
-      fs.writeFileSync(
-        this.path,
-        JSON.stringify(ProductManager.#products, null, 2)
-      );
-      return "Producto creado";
+        this.products.push(data);
+        const jsonData = JSON.stringify(this.products, null, 2);
+        await fs.promises.writeFile(this.path, jsonData);
+        return data;
     } catch (error) {
-      return error.message;
+        throw error;
     }
-  }
+};
 
-  read() {
+  read({filter,options}) {
     try {
       if (ProductManager.#products.length === 0) {
-        throw new Error("No se encontraron productos!");
+        throw new Error("there aren't products");
       } else {
         return ProductManager.#products;
       }
     } catch (error) {
-      return error.message;
+      throw error;
     }
   }
 
-  readOne(id) {
+ async readOne(id) {
     try {
-      const product = ProductManager.#products.find(
-        (product) => product.id === id
-      );
-      if (!product) {
-        throw new Error("No se encontro producto!");
+      const one = this.products.find((each)=> each._id === id);
+      if (!one) {
+        const error = new Error ("NOT FOUND!");
+        error.statuscode = 404;
+        throw error;
       } else {
-        return product;
+        return one;
       }
     } catch (error) {
-      return error.message;
+      throw error;
     }
   }
 
-  destroy(id){
+  async destroy(id) {
     try {
-      const product = ProductManager.#products.find(
-        (product) => product.id === id
-      );
-      if (!product) {
-        throw new Error("No se encontro producto!");
-      } else {
-        const index = ProductManager.#products.indexOf(product);
-        ProductManager.#products.splice(index, 1);
-        fs.writeFileSync(
-          this.path,
-          JSON.stringify(ProductManager.#products, null, 2)
-        );
-        return "Producto eliminado";
-      }
+        const one = await this.readOne(id);
+        notFoundOne(one);
+        this.products = this.products.filter((each) => each._id !== id);
+        const jsonData = JSON.stringify(this.products, null, 2);
+        await fs.promises.writeFile(this.path, jsonData);
     } catch (error) {
-      return error.message;
+        throw error;
     }
-  }
+}
 
-  update(id,data){
+ async update(id,data){
     try {
      const one= this.readOne(id);
 
@@ -118,5 +98,5 @@ class ProductManager {
   }
 }
 
-const ManagerProduct = new ProductManager();
-export default ManagerProduct;
+const products = new ProductManager("./src/data/fs/files/products.json");
+export default products;
