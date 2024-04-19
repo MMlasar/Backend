@@ -19,6 +19,7 @@ import sessionFileStote from "session-file-store";
 import MongoStore from "connect-mongo";
 import args from "./src/utils/args.utils.js";
 import cors from "cors"
+import compression from "express-compression";
 
 
 const app = express();
@@ -76,7 +77,9 @@ app.use(expressSession)({
     })
 
 })
-
+app.use(compression({
+  brotli: { enabled:true, zlib:{}}
+}));
 
 // Routers
 const router = new IndexRouter();
