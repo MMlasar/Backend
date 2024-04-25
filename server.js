@@ -21,7 +21,7 @@ import args from "./src/utils/args.utils.js";
 import cors from "cors"
 import compression from "express-compression";
 import winston from "./src/middlewares/wiston.js";
-import winstonLog from "./src/utils/winston.utils.js";
+import winstonLog from "./src/utils/logger/winston.utils.js";
 
 
 const app = express();

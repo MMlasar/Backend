@@ -1,5 +1,5 @@
 import { connect } from "mongoose";
-import winston from "../utils/winston.utils.js";
+import winston from "./logger/winston.utils.js";
 
 const dbconnection = async () => {
     try {

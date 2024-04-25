@@ -1,4 +1,4 @@
-import winston from "../utils/winston.utils.js";
+import winston from "../utils/logger/winston.utils.js";
 
 const pathHandler = (req, res, next) => {
     const errorMessage = `${req.method} ${req.url} not found path`;

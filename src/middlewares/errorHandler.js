@@ -1,4 +1,4 @@
-import winston from "../utils/winston.utils.js";
+import winston from "../utils/logger/winston.utils.js";
 
 const errorHandler = (error, req, res, next) => {
     if (!error.statusCode || error.statusCode === 500) {
