@@ -1,9 +1,12 @@
+import winston from "../utils/winston.utils.js";
+
 const pathHandler = (req, res, next) => {
-    console.error(`${req.method} ${req.url} not found path`)
+    const errorMessage = `${req.method} ${req.url} not found path`;
+    winston.WARN(errorMessage);
     return res.json({
         statusCode: 404,
-        message: `${req.method} ${req.url} not found path`,
-    })
-}
+        message: `not found path`,
+    });
+};
 
-export default pathHandler
+export default pathHandler;

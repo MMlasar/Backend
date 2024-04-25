@@ -20,13 +20,15 @@ import MongoStore from "connect-mongo";
 import args from "./src/utils/args.utils.js";
 import cors from "cors"
 import compression from "express-compression";
+import winston from "./src/middlewares/wiston.js";
+import winstonLog from "./src/utils/winston.utils.js";
 
 
 const app = express();
 const PORT = env.PORT || 8080;
 
 const ready = () => {
-    console.log(`Server ready on port ${PORT}`);
+    winstonLog.INFO(`Server ready on port ${PORT}`);
     dbconnection()
 };
 
@@ -51,6 +53,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
+app.use(winston);
 app.use(cookieParser());
 app.use(cors({
   origin: true,

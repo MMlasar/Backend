@@ -1,3 +1,4 @@
+import winstrol from "winstrol";
 
 export const messages = [];
 
@@ -7,11 +8,11 @@ export function startSocket(socketServer, ManagerProduct) {
 
         socket.on("new products", async (data) => {
             try {
-                console.log(data);
+                winstrol.INFO(data);
                 ManagerProduct.createproducts(data);
                 socket.emit("products", ManagerProduct.readproducts());
             } catch (error) {
-                console.log(error);
+                winstrol.ERROR(error);
             }
         });
 
