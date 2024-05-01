@@ -22,6 +22,8 @@ import cors from "cors"
 import compression from "express-compression";
 import winston from "./src/middlewares/wiston.js";
 import winstonLog from "./src/utils/logger/winston.utils.js";
+import cluster from "cluster";
+import { cpus } from "os";
 
 
 const app = express();
@@ -34,7 +36,6 @@ const ready = () => {
 
 const httpServer = createServer(app);
 const socketServer = new Server(httpServer);
-httpServer.listen(PORT, ready);
 
 const __dirname = path.resolve();
 
@@ -90,3 +91,13 @@ app.use("/", router. getRouter());
 app.use(errorHandler);
 app.use(pathHandler);
 
+//clusters
+if (cluster.isPrimary) {
+  const numbersOfProcess = cpus().length;
+  winston.info("NUMBERS OF PROCESS OF MY COMPUTER: " + numbersOfProcess);
+  for (let i = 1; i <= numbersOfProcess; i++) {
+      cluster.fork();
+  }
+} else {
+  httpServer.listen(PORT, ready);
+}
