@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: balanzasml
+spec:
+  selector:
+    app: balanzasml
+  ports:
+    - port: 80
+      targetPort: 8080
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: balanzasml
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: balanzasml
+  template:
+    metadata:
+      labels:
+        app: balanzasml
+    spec:
+      containers:
+      - name: balanzasml
+        image: marianlasarte/balanzasml:1.0.0
+        ports:
+          - containerPort: 8080
