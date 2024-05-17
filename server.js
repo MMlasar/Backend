@@ -24,10 +24,18 @@ import winston from "./src/middlewares/wiston.js";
 import winstonLog from "./src/utils/logger/winston.utils.js";
 import cluster from "cluster";
 import { cpus } from "os";
+import options from "./src/utils/swagger.js";
+import swaggerJSdoc from "swagger-jsdoc";
+import { serve, setup } from "swagger-ui-express";
+
 
 
 const app = express();
 const PORT = env.PORT || 8080;
+
+
+const specs = swaggerJSdoc (options);
+app.use("/api/docs", serve, setup (specs));
 
 const ready = () => {
     winstonLog.INFO(`Server ready on port ${PORT}`);

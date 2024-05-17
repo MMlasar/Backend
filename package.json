@@ -9,10 +9,11 @@
     "dev": "nodemon server.js --env dev",
     "test": "nodemon server.js --env test",
     "mocks": "node ./src/data/mocks/users.mock.js",
-    "image": "docker build -t balanzasml ." ,
+    "image": "docker build -t balanzasml .",
     "container": "docker run -p 8080:8080 balanzasml",
-    "orquestra":"kubectl apply -f ./orquestra.yaml",
-    "mini":"minikube service balanzasml"
+    "orquestra": "kubectl apply -f ./orquestra.yaml",
+    "mini": "minikube service balanzasml",
+    "mocha": "mocha ./test/mocha"
   },
   "keywords": [],
   "author": "",
@@ -41,10 +42,15 @@
     "passport-local": "^1.0.0",
     "session-file-store": "^1.5.0",
     "socket.io": "^4.7.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "twilio": "^5.0.2",
     "winston": "^3.13.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "^8.4.1"
+    "@faker-js/faker": "^8.4.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
+    "mocha": "^10.4.0"
   }
 }

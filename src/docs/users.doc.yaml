@@ -1,0 +1,115 @@
+components:
+  schemas:
+    Register:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Name of the user
+        last_name:
+          type: string
+          description: Last name of the user
+        email:
+          type: string
+          description: Email of the user
+        password:
+          type: string
+          description: Password of the user
+      example:
+        first_name: gabrilea
+        last_name: gomez
+        email: gabrieal@gomez.com
+        password: hola1234
+
+  responses:
+    res201:
+      description: Successful response
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: Successful Code
+              payload:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  password:
+                    type: string
+                  avatar:
+                    type: string
+                  role:
+                    type: string
+                description: Data of the registered user 
+          example:
+            status: success
+            payload:
+              _id: 1234567890
+              first_name: gabrilea
+              last_name: gomez
+              password: hola1234
+              avatar: "avatar-url"
+              role: "user"
+
+    res401:
+      description: Unauthorized. Authentication is required to access this resource.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+
+    res500:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+
+paths:
+  /api/sessions/register:
+    post:
+      summary: To register a user
+      tags:
+        - sessions
+      requestBody:
+        required: true
+        description: Data of the user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/res201'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/res401'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/res500'
+    
