@@ -4,7 +4,7 @@ import dao from '../../src/data/index.factory.js';
 import 'dotenv/config.js';
 
 describe("Pruebas del Modelo de Productos con Chai", () => {
-    const Product = new dao.Product();
+    const Product = new dao.products();
     const data = { name: "Balanza analítica" };
     let id;
 

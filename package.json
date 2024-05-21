@@ -14,7 +14,7 @@
     "orquestra": "kubectl apply -f ./orquestra.yaml",
     "mini": "minikube service balanzasml",
     "mocha": "mocha ./test/mocha",
-    "chai" : "mocha ./test/chai"
+    "chai": "mocha ./test/chai"
   },
   "keywords": [],
   "author": "",
@@ -53,6 +53,7 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
     "chai": "^5.1.1",
-    "mocha": "^10.4.0"
+    "mocha": "^10.4.0",
+    "supertest": "^7.0.0"
   }
 }
