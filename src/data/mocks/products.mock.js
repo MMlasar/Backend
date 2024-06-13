@@ -1,3 +1,4 @@
+import winstrol from "winstrol";
 import faker from '@faker-js/faker';
 import repository from '../../repositories/productos.rep.js';
 import dbconnection from '../../utils/db.connection.utils.js';
@@ -15,9 +16,8 @@ export default async function createProductMocks(id) {
     try {
         const data = productMock(id);
         await repository.create(data);
-        console.log("PRODUCT CREATED!");
+        winstrol.INFO("PRODUCT CREATED!");
     } catch (error) {
-        console.log(error);
+        winstrol.ERROR("An error occurred:", error);
     }
 }
-

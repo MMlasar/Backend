@@ -1,3 +1,4 @@
+import winstrol from "winstrol";
 import User from "./models/user.model.js";
 import Product from "./models/product.model.js";
 import order from "./models/order.model.js";
@@ -5,8 +6,6 @@ import notFoundOne from "../../utils/notFoundOne.utils.js";
 import { Stats } from "fs";
 import { Types } from "mongoose";
 import { types } from "util";
-
-
 
 class MongoManager {
     constructor (model) {
@@ -17,7 +16,6 @@ class MongoManager {
         try {
             const one = await this.model.create(data);
             return one._id;
-            
         } catch (error) {
             throw error;
         }
@@ -25,15 +23,11 @@ class MongoManager {
 
     async read( { filter , orderAndPaginate} ) {
         try {
-            const all = await this.model
-            //const all = await this.model.find(filter).sort(order);
-
-            .paginate(filter, orderAndPaginate);
-            //console.log(all.docs);
+            const all = await this.model.paginate(filter, orderAndPaginate);
+            winstrol.INFO("Retrieved documents:", all);
     
-            //if (all.docs.length === 0) {
-                if (all.totalPages === 0){
-                const error = new Error("there aren't products");
+            if (all.totalPages === 0){
+                const error = new Error("There aren't products");
                 error.statusCode = 404;
                 throw error;
             }
@@ -46,7 +40,7 @@ class MongoManager {
     async reportBill (uid) {
         try {
             const report = await this.model.aggregate([
-                {$match: { user_id: new types.ObjetId(uid)}},
+                {$match: { user_id: new types.ObjectId(uid)}},
                 {$lookup: { 
                     from:"products",
                     foreignField: "_id",
@@ -57,7 +51,6 @@ class MongoManager {
                 {$set : { subtotal: {$multiply:["$price","$quantity"]}}},
                 {$group: { _id:"$product_id", total: { $sum: "$subtotal"}} },
                 {$project: {_id:0, product_id:"$_id", total: "$total", date: new Date() } },
-                //{$marge: { into: "bills"}},
             ]);
             return report
         } catch (error) {
@@ -77,22 +70,19 @@ class MongoManager {
 
     async readByEmail(email){
         try {
-            const one = await this.model.findOne({ email })
-           //notFoundOne(one);
+            const one = await this.model.findOne({ email });
             return one;
         } catch (error) {
             throw error
         }
     }
 
-    
-
     async update(id, data) {
         try {
             const opt = { new: true };
             const one = await this.model.findByIdAndUpdate(id, data, opt);
             if (!one) {
-                const error = new Error("there isn't product");
+                const error = new Error("There isn't product");
                 error.statusCode = 404;
                 throw error;
             }
@@ -105,19 +95,19 @@ class MongoManager {
     async destroy(id) {
         try {
             const one = await this.model.findByIdAndDelete(id);
-            notFoundOne(one)
+            notFoundOne(one);
         }    catch (error) {
-           throw error;
-       }
+            throw error;
+        }
     }
     
     async stats( {filter} ){
         try {
-            let = stats =await this.model(filter).explain("executionStats");
+            let stats = await this.model(filter).explain("executionStats");
 
-            stats= {
-                quantity: this.stats.executionStats.nReturned,
-                time: this.stats.executionStats.executionTimeMillis,
+            stats = {
+                quantity: stats.executionStats.nReturned,
+                time: stats.executionStats.executionTimeMillis,
             };
             return stats;
 
@@ -126,7 +116,5 @@ class MongoManager {
         }
     }
 }
-
-
 
 export default MongoManager;
