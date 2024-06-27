@@ -1,6 +1,8 @@
+// src/data/fs/products.js
+
 import fs from "fs";
 import crypto from "crypto";
-import notFoundOne from "../../utils/notFoundOne.utils";
+import notFoundOne from "../../utils/notFoundOne.utils.js";
 
 class ProductManager {
   static #products = [];

@@ -1,11 +1,11 @@
-function notFoundOne (one){ 
+// src/utils/notFoundOne.utils.js
+
+const notFoundOne = (one) => {
     if (!one) {
-        const error = new Error("there isn't any document");
+        const error = new Error("Item not found");
         error.statusCode = 404;
         throw error;
     }
-    return one;
-}
-
+};
 
 export default notFoundOne;

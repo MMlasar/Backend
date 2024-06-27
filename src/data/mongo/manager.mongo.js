@@ -1,131 +1,70 @@
-import winston from "winston";
-import { Types } from "mongoose";
-import notFoundOne from "../../utils/notFoundOne.utils.js";
+import { Router } from "express";
+import jwt from "jsonwebtoken";
+import { users, products } from "../data/mongo/manager.mongo.js"; // Importa users y products
 
-class MongoManager {
-    constructor(model) {
-        this.model = model;
+export default class CustomRouter {
+    constructor() {
+        this.Router = Router();
+        this.init();
     }
 
-    async create(data) {
-        try {
-            const one = await this.model.create(data);
-            return one._id;
-        } catch (error) {
-            throw error;
-        }
+    getRouter() {
+        return this.Router;
     }
 
-    async read({ filter, orderAndPaginate }) {
-        try {
-            const all = await this.model.paginate(filter, orderAndPaginate);
-            winston.info("Retrieved documents:", all);
+    init() {}
 
-            if (all.totalPages === 0) {
-                const error = new Error("There are no products");
-                error.statusCode = 404;
-                throw error;
+    applyCbs(cbs) {
+        return cbs.map(each => async (...params) => {
+            try {
+                await each.apply(this.params);
+            } catch (error) {
+                params[1].json({ statuscode: 500, message: error.message });
             }
-            return all;
-        } catch (error) {
-            throw error;
-        }
+        });
     }
 
-    async reportBill(uid) {
+    policies = (arrayOfPolicies) => async (req, res, next) => {
         try {
-            const report = await this.model.aggregate([
-                {
-                    $match: { user_id: new Types.ObjectId(uid) }
-                },
-                {
-                    $lookup: {
-                        from: "products",
-                        foreignField: "_id",
-                        localField: "product_id",
-                        as: "product"
-                    }
-                },
-                {
-                    $set: { subtotal: { $multiply: ["$price", "$quantity"] } }
-                },
-                {
-                    $group: {
-                        _id: "$product_id",
-                        total: { $sum: "$subtotal" }
-                    }
-                },
-                {
-                    $project: {
-                        _id: 0,
-                        product_id: "$_id",
-                        total: "$total",
-                        date: new Date()
+            if (arrayOfPolicies.includes("PUBLIC")) return next();
+            let token = req.cookies["token"];
+            if (!token) return res.error401();
+            else {
+                const data = jwt.verify(token, process.env.SECRET);
+                if (!data) return res.error401("Bad auth by token!");
+                else {
+                    const { email, role } = data;
+                    if (!(role === 0 && arrayOfPolicies.includes("USER")) || (role === 1 && arrayOfPolicies.includes("ADMIN")) || (role === 2 && arrayOfPolicies.includes("PREM"))) {
+                        const user = await users.readByEmail(email); // Corrige la función a readByEmail
+                        req.user = user;
+                        return next();
+                    } else {
+                        return res.error403();
                     }
                 }
-            ]);
-            return report;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async readOne(id) {
-        try {
-            const one = await this.model.findById(id).lean();
-            notFoundOne(one);
-            return one;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async readByEmail(email) {
-        try {
-            const one = await this.model.findOne({ email });
-            return one;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async update(id, data) {
-        try {
-            const opt = { new: true };
-            const one = await this.model.findByIdAndUpdate(id, data, opt);
-            if (!one) {
-                const error = new Error("Product not found");
-                error.statusCode = 404;
-                throw error;
             }
-            return one;
         } catch (error) {
-            throw error;
+            return next();
         }
+    };
+
+    create(path, policies, ...cbs) {
+        this.Router.post(path, this.policies([policies]), this.applyCbs(cbs));
     }
 
-    async destroy(id) {
-        try {
-            const one = await this.model.findByIdAndDelete(id);
-            notFoundOne(one);
-        } catch (error) {
-            throw error;
-        }
+    read(path, policies, ...cbs) {
+        this.Router.get(path, this.policies([policies]), this.applyCbs(cbs));
     }
 
-    async stats({ filter }) {
-        try {
-            let stats = await this.model(filter).explain("executionStats");
+    update(path, policies, ...cbs) {
+        this.Router.put(path, this.policies([policies]), this.applyCbs(cbs));
+    }
 
-            stats = {
-                quantity: stats.executionStats.nReturned,
-                time: stats.executionStats.executionTimeMillis
-            };
-            return stats;
-        } catch (error) {
-            throw error;
-        }
+    destroy(path, policies, ...cbs) {
+        this.Router.delete(path, this.policies([policies]), this.applyCbs(cbs));
+    }
+
+    use(path, ...cbs) {
+        this.Router.use(path, this.applyCbs(cbs));
     }
 }
-
-export default MongoManager;

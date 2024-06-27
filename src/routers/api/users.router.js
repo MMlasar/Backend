@@ -1,14 +1,14 @@
 import { Router } from "express";
 import propsUser from "../../middlewares/propsUser.js";
-//import { ManagerUser } from "../../data/fs/user.fs.js"; // Importar ManagerUser de FileSystem
-import { users, products } from "../../data/mongo/manager.mongo.js"; // Importar users y products de MongoDB
+import { users, products } from "../data/mongo/manager.mongo.js";
+
 
 const usersRouter = Router();
 
 usersRouter.post("/", propsUser, async (req, res, next) => {
     try {
         const userData = req.body;
-        const userId = await ManagerUser.create(userData); // Utilizar ManagerUser de FileSystem
+        const userId = await users.create(userData);
         return res.status(201).json({
             statusCode: 201,
             userId: userId,
@@ -23,17 +23,13 @@ usersRouter.get('/', async (req, res, next) => {
         const orderAndPaginate = {
             limit: req.query.limit || 20,
             page: req.query.page || 1,
-           // sort: { email: 1 }
         };
         const filter = {};
         if (req.query.email) {
             filter.email = new RegExp(req.query.email.trim(), "i");
         }
-        if (req.query.sortDesc === "true") {
-            orderAndPaginate.sort.email = -1;
-        }
         const allUsers = await users.read({ filter, orderAndPaginate });
-        if (allUsers) {
+        if (allUsers.docs.length > 0) { // Verificar si hay documentos encontrados
             return res.status(200).json({
                 statusCode: 200,
                 response: allUsers,
@@ -49,11 +45,10 @@ usersRouter.get('/', async (req, res, next) => {
     }
 });
 
-
 usersRouter.get('/:uid', async (req, res, next) => {
     try {
         const { uid } = req.params;
-        const user = await users.readOne(uid); // Utilizar users de MongoDB
+        const user = await users.readOne(uid);
         if (user) {
             return res.status(200).json({
                 statusCode: 200,
@@ -74,7 +69,7 @@ usersRouter.put('/:uid', async (req, res, next) => {
     try {
         const { uid } = req.params;
         const data = req.body;
-        const updatedUser = await users.update(uid, data); // Utilizar users de MongoDB
+        const updatedUser = await users.update(uid, data);
         if (updatedUser) {
             return res.status(200).json({
                 statusCode: 200,
@@ -94,7 +89,7 @@ usersRouter.put('/:uid', async (req, res, next) => {
 usersRouter.delete('/:uid', async (req, res, next) => {
     try {
         const { uid } = req.params;
-        const deletedUser = await users.destroy(uid); // Utilizar users de MongoDB
+        const deletedUser = await users.destroy(uid);
         if (deletedUser) {
             return res.status(200).json({
                 statusCode: 200,
