@@ -1,4 +1,4 @@
-import winstrol from "winstrol";
+import winston from "winston";
 
 export const messages = [];
 
@@ -8,11 +8,11 @@ export function startSocket(socketServer, ManagerProduct) {
 
         socket.on("new products", async (data) => {
             try {
-                winstrol.INFO(data);
+                winston.info(data);
                 ManagerProduct.createproducts(data);
                 socket.emit("products", ManagerProduct.readproducts());
             } catch (error) {
-                winstrol.ERROR(error);
+                winston.error(error);
             }
         });
 

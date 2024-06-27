@@ -1,4 +1,4 @@
-import winstrol from "winstrol";
+import winston from "winston";
 import crypto from "crypto";
 
 class UserManager {
@@ -22,6 +22,7 @@ class UserManager {
                 throw new Error("Los campos name, photo, email son obligatorias");
             }
         } catch (error) {
+            winston.error(`Error al crear usuario: ${error.message}`);
             return error.message;
         }
     }
@@ -29,11 +30,12 @@ class UserManager {
     read() {
         try {
             if (UserManager.#user.length === 0) {
-                throw new Error("No se encontro ningun usuario");
+                throw new Error("No se encontró ningún usuario");
             } else {
                 return UserManager.#user;
             }
         } catch (error) {
+            winston.error(`Error al leer usuarios: ${error.message}`);
             return error.message;
         }
     }
@@ -45,9 +47,10 @@ class UserManager {
             if (user) {
                 return user;
             } else {
-                throw new Error("No encontrado");
+                throw new Error("Usuario no encontrado");
             }
         } catch (error) {
+            winston.error(`Error al leer usuario: ${error.message}`);
             return error.message;
         }
     }
@@ -57,7 +60,7 @@ class UserManager {
             const one = this.readOne(id);
 
             if (!one) {
-                throw new Error("No se encontro usuario!");
+                throw new Error("Usuario no encontrado");
             } else {
                 const index = UserManager.#user.indexOf(one);
                 one.name = data.name || one.name;
@@ -66,9 +69,10 @@ class UserManager {
 
                 UserManager.#user[index] = one;
 
-                return "usuario actualizada";
+                return "Usuario actualizado";
             }
         } catch (error) {
+            winston.error(`Error al actualizar usuario: ${error.message}`);
             return error.message;
         }
     }
@@ -77,7 +81,7 @@ class UserManager {
         try {
             const user = UserManager.#user.find((user) => user.id === id);
             if (!user) {
-                throw new Error("No se encontro usuario!");
+                throw new Error("Usuario no encontrado");
             } else {
                 const index = UserManager.#user.indexOf(user);
                 UserManager.#user.splice(index, 1);
@@ -85,12 +89,13 @@ class UserManager {
                 return "Usuario eliminado";
             }
         } catch (error) {
+            winston.error(`Error al eliminar usuario: ${error.message}`);
             return error.message;
         }
     }
 }
 
 const Manager = new UserManager();
-winstrol.INFO(Manager.create({ photo: "https://picsum.photos/200", email: "jH6Qm@example.com" }));
+winston.info(Manager.create({ photo: "https://picsum.photos/200", email: "jH6Qm@example.com" }));
 Manager.create({ name: "Roman", photo: "https://picsum.photos/200", email: "jH6Qm@example.com" });
-winstrol.INFO(Manager.read());
+winston.info(Manager.read());

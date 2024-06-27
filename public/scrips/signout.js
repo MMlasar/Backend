@@ -1,4 +1,4 @@
-import winstrol from "winstrol";
+import winston from "winston";
 
 document.querySelector("#signout").addEventListener("click", async () => {
     try {
@@ -8,12 +8,12 @@ document.querySelector("#signout").addEventListener("click", async () => {
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
         };
 
-        winstrol.INFO("Sending signout request to server");
+        winston.info("Sending signout request to server");
 
         let response = await fetch("/api/sessions/signout", opts);
         response = await response.json();
 
-        winstrol.INFO("Response from server:", response);
+        winston.info("Response from server:", response);
 
         alert(response.message);
         
@@ -22,7 +22,7 @@ document.querySelector("#signout").addEventListener("click", async () => {
             location.replace("/");
         }
     } catch (error) {
-        winstrol.ERROR("An error occurred:", error);
-        console.log(error);
+        winston.error("An error occurred:", error);
+        console.error(error);
     }
 });

@@ -1,7 +1,7 @@
-import winstrol from "winstrol";
+import winston from "./utils/logger/winston.utils.js";
 import io from "socket.io-client";
 
-winstrol.INFO("socket");
+winston.info("socket");
 
 const socket = io();
 
@@ -17,7 +17,7 @@ socket.on("products", (data) => {
 
 socket.emit("new products", {});
 
-socket.on("new success", (message) => winstrol.INFO(message));
+socket.on("new success", (message) => winston.info(message));
 
 document.querySelector("#newproducts").addEventListener("click", (event) => {
     event.preventDefault();
@@ -37,7 +37,7 @@ document.querySelector("#newproducts").addEventListener("click", (event) => {
     }
     stock && (data.stock = stock);
 
-    winstrol.INFO(data);
+    winston.info(data);
 
     socket.emit("newproducts", data);
 });

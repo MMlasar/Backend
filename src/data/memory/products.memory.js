@@ -18,7 +18,7 @@ class ProductManager {
         ProductManager.#products.push(newProduct);
         return newProduct;
       } else {
-        throw new Error("Los campos title, photo, price, stock son obligatorias");
+        throw new Error("Los campos title, photo, price, stock son obligatorios");
       }
     } catch (error) {
       throw error;
@@ -40,7 +40,9 @@ class ProductManager {
   static readOne(id) {
     try {
       const product = ProductManager.#products.find((product) => product.id === id);
-      notFoundOne(product);
+      if (!product) {
+        throw new Error("Producto no encontrado");
+      }
       return product;
     } catch (error) {
       throw error;
@@ -51,11 +53,10 @@ class ProductManager {
     try {
       const productIndex = ProductManager.#products.findIndex((product) => product.id === id);
       if (productIndex === -1) {
-        throw new Error("No se encontró el producto");
-      } else {
-        ProductManager.#products.splice(productIndex, 1);
-        return "Producto eliminado";
+        throw new Error("Producto no encontrado");
       }
+      ProductManager.#products.splice(productIndex, 1);
+      return "Producto eliminado";
     } catch (error) {
       throw error;
     }
@@ -63,18 +64,18 @@ class ProductManager {
 
   static async update(id, data) {
     try {
-      const one = await this.readOne(id);
-      notFoundOne(one);
-      for (let each in data) {
-        one[each] = data[each];
+      const product = await this.readOne(id);
+      for (let key in data) {
+        if (key in product) {
+          product[key] = data[key];
+        }
       }
-      return one;
+      return product;
     } catch (error) {
       throw error;
     }
   }
 }
 
-const products = new ProductManager();
-export default products;
+export default ProductManager;
 

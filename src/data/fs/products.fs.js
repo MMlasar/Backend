@@ -5,8 +5,8 @@ import notFoundOne from "../../utils/notFoundOne.utils";
 class ProductManager {
   static #products = [];
 
-  constructor() {
-    this.path = "./src/data/fs/files/products.json";
+  constructor(filePath) {
+    this.path = filePath;
     this.conf = "utf-8";
     this.init();
   }
@@ -24,19 +24,19 @@ class ProductManager {
 
   create = async (data) => {
     try {
-        this.products.push(data);
-        const jsonData = JSON.stringify(this.products, null, 2);
-        await fs.promises.writeFile(this.path, jsonData);
-        return data;
+      data._id = crypto.randomBytes(12).toString("hex");
+      ProductManager.#products.push(data);
+      await fs.promises.writeFile(this.path, JSON.stringify(ProductManager.#products, null, 2));
+      return data;
     } catch (error) {
-        throw error;
+      throw error;
     }
-};
+  };
 
-  read({filter,options}) {
+  read({ filter, options }) {
     try {
       if (ProductManager.#products.length === 0) {
-        throw new Error("there aren't products");
+        throw new Error("There are no products");
       } else {
         return ProductManager.#products;
       }
@@ -45,12 +45,12 @@ class ProductManager {
     }
   }
 
- async readOne(id) {
+  async readOne(id) {
     try {
-      const one = this.products.find((each)=> each._id === id);
+      const one = ProductManager.#products.find((each) => each._id === id);
       if (!one) {
-        const error = new Error ("NOT FOUND!");
-        error.statuscode = 404;
+        const error = new Error("Product not found");
+        error.statusCode = 404;
         throw error;
       } else {
         return one;
@@ -62,38 +62,35 @@ class ProductManager {
 
   async destroy(id) {
     try {
-        const one = await this.readOne(id);
-        notFoundOne(one);
-        this.products = this.products.filter((each) => each._id !== id);
-        const jsonData = JSON.stringify(this.products, null, 2);
-        await fs.promises.writeFile(this.path, jsonData);
+      const one = await this.readOne(id);
+      notFoundOne(one);
+      ProductManager.#products = ProductManager.#products.filter(
+        (each) => each._id !== id
+      );
+      await fs.promises.writeFile(this.path, JSON.stringify(ProductManager.#products, null, 2));
     } catch (error) {
-        throw error;
+      throw error;
     }
-}
+  }
 
- async update(id,data){
+  async update(id, data) {
     try {
-     const one= this.readOne(id);
+      let one = await this.readOne(id);
 
-      if(!one){
-        throw new Error("No se encontro producto!")
-      }else{
-          one.title= data.title || one.title,
-          one.photo= data.photo || one.photo,
-          one.price= data.price || one.price,
-          one.stock= data.stock || one.stock,
+      if (!one) {
+        throw new Error("Product not found!");
+      } else {
+        one.title = data.title || one.title;
+        one.photo = data.photo || one.photo;
+        one.price = data.price || one.price;
+        one.stock = data.stock || one.stock;
 
-        fs.writeFileSync(
-          this.path,
-          JSON.stringify(ProductManager.#products, null, 2)
-        );
-
-        return "producto actualizada"
+        await fs.promises.writeFile(this.path, JSON.stringify(ProductManager.#products, null, 2));
+        
+        return "Product updated";
       }
-
     } catch (error) {
-      return error.message;
+      throw error;
     }
   }
 }
