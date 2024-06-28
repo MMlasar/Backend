@@ -16,7 +16,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import cors from "cors";
 import compression from "express-compression";
-import winston from "./src/middlewares/winston.js"; // Ruta correcta a winston.js
+import winston from "./src/middlewares/winston.js";
 import winstonLog from "./src/utils/logger/winston.utils.js";
 import cluster from "cluster";
 import { cpus } from "os";
