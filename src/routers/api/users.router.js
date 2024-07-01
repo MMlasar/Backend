@@ -1,6 +1,6 @@
 import { Router } from "express";
 import propsUser from "../../middlewares/propsUser.js";
-import { users, products } from "../data/mongo/manager.mongo.js";
+import { users, products } from "../../data/mongo/manager.mongo.js";
 
 
 const usersRouter = Router();

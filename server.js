@@ -1,4 +1,5 @@
 // server.js
+
 import env from "./src/utils/env.utils.js";
 import express from 'express';
 import { createServer } from 'http';
@@ -9,14 +10,15 @@ import pathHandler from "./src/middlewares/pathHandler.js";
 import { engine } from "express-handlebars";
 import morgan from "morgan";
 import path from "path";
-import { startSocket } from './src/utils/socket.utils.js';
+import { startSocket } from './src/utils/socket.utils.js'; // Asegúrate de importar startSocket si es necesario
 import dbconnection from "./src/utils/db.connection.utils.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import cors from "cors";
 import compression from "express-compression";
-import winston from "./src/middlewares/winston.js";
+import CustomRouter from "./src/routers/customRouter.js"; // Asegúrate de importar CustomRouter si es necesario
+import { default as winston, logger } from "./src/middlewares/winston.js"; // Importa winston y logger correctamente
 import winstonLog from "./src/utils/logger/winston.utils.js";
 import cluster from "cluster";
 import { cpus } from "os";
@@ -64,7 +66,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(morgan("dev"));
-app.use(winston);
+app.use(winston); // Asegúrate de usar `winston` como middleware
 app.use(cookieParser());
 app.use(cors({
     origin: true,
@@ -85,7 +87,7 @@ app.use(pathHandler);
 // Clusters
 if (cluster.isPrimary) {
     const numberOfProcesses = cpus().length;
-    winston.info("Number of processes in the system: " + numberOfProcesses);
+    logger.info("Number of processes in the system: " + numberOfProcesses); // Usa `logger.info` en lugar de `winston.info`
     for (let i = 1; i <= numberOfProcesses; i++) {
         cluster.fork();
     }

@@ -1,15 +1,16 @@
-import { Router } from "express";
-import jwt from "jsonwebtoken";
-import { users } from "../data/mongo/manager.mongo.js"; // Importa solo users desde manager.mongo.js
+// customRouter.js
+
+import { Router } from 'express';
+import jwt from 'jsonwebtoken';
+import { users } from '../data/mongo/manager.mongo.js';
 
 export default class CustomRouter {
     constructor() {
-        this.Router = Router();
-        this.init();
+        this.router = Router(); // Inicializa el enrutador de Express
     }
 
     getRouter() {
-        return this.Router;
+        return this.router;
     }
 
     init() {}
@@ -17,7 +18,7 @@ export default class CustomRouter {
     applyCbs(cbs) {
         return cbs.map(each => async (...params) => {
             try {
-                await each.apply(this, params); // Corregido para aplicar correctamente los parámetros
+                await each.apply(this, params); // Aplica los parámetros correctamente
             } catch (error) {
                 params[1].json({ statusCode: 500, message: error.message });
             }
@@ -51,22 +52,22 @@ export default class CustomRouter {
     };
 
     create(path, policies, ...cbs) {
-        this.Router.post(path, this.policies([policies]), ...this.applyCbs(cbs)); // Corregido para aplicar correctamente los callbacks
+        this.router.post(path, this.policies([policies]), ...this.applyCbs(cbs)); // Aplica correctamente los callbacks
     }
 
     read(path, policies, ...cbs) {
-        this.Router.get(path, this.policies([policies]), ...this.applyCbs(cbs)); // Corregido para aplicar correctamente los callbacks
+        this.router.get(path, this.policies([policies]), ...this.applyCbs(cbs)); // Aplica correctamente los callbacks
     }
 
     update(path, policies, ...cbs) {
-        this.Router.put(path, this.policies([policies]), ...this.applyCbs(cbs)); // Corregido para aplicar correctamente los callbacks
+        this.router.put(path, this.policies([policies]), ...this.applyCbs(cbs)); // Aplica correctamente los callbacks
     }
 
     destroy(path, policies, ...cbs) {
-        this.Router.delete(path, this.policies([policies]), ...this.applyCbs(cbs)); // Corregido para aplicar correctamente los callbacks
+        this.router.delete(path, this.policies([policies]), ...this.applyCbs(cbs)); // Aplica correctamente los callbacks
     }
 
     use(path, ...cbs) {
-        this.Router.use(path, ...this.applyCbs(cbs)); // Corregido para aplicar correctamente los callbacks
+        this.router.use(path, ...this.applyCbs(cbs)); // Aplica correctamente los callbacks
     }
 }

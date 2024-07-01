@@ -147,3 +147,4 @@ const products = new MongoManager(ProductModel);
 
 // Exporta las instancias de MongoManager para usuarios y productos
 export { users, products };
+export default MongoManager;

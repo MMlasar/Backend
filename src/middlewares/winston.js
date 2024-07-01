@@ -1,15 +1,23 @@
-import logger from "../utils/socket.utils.js";
+import winston from 'winston';
 
-function winston(req, res, next) {
+// Configuración de Winston
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        // Agrega otros transports aquí si es necesario
+    ],
+});
+
+function winstonMiddleware(req, res, next) {
     try {
         req.logger = logger;
         const message = `${req.method} ${req.url} - ${new Date().toLocaleDateString()}`;
-        req.logger.HTTP(message);
+        req.logger.info(message);
         return next();
     } catch (error) {
         return next(error);
     }
 }
 
-export default winston;
-
+export default winstonMiddleware;
+export { logger }; // También exporta logger para usarlo directamente si es necesario
